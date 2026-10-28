@@ -241,3 +241,94 @@ def test_minimum_maximum():
     img += 1
     img[10, 10] = 255
     assert sitk.MinimumMaximum(img) == (1.0, 255.0)
+
+
+def _sparse_label_volume():
+    volume = sitk.Image([32, 32, 16], sitk.sitkUInt8)
+    square = sitk.Image([12, 12, 1], sitk.sitkUInt8) + 1
+    volume = sitk.Paste(volume, square, square.GetSize(), [0, 0, 0], [10, 10, 3])
+    volume = sitk.Paste(volume, square, square.GetSize(), [0, 0, 0], [10, 10, 11])
+    return volume
+
+
+def test_fast_bilateral_image_filter():
+    """Test the FastBilateralImageFilter wrapped from the ITK FastBilateral module."""
+    if not hasattr(sitk, "FastBilateralImageFilter"):
+        pytest.skip("FastBilateralImageFilter not available")
+
+    clean = sitk.Image([64, 64], sitk.sitkFloat32)
+    half = sitk.Image([32, 64], sitk.sitkFloat32) + 100.0
+    clean = sitk.Paste(clean, half, half.GetSize(), [0, 0], [32, 0])
+    noisy = sitk.AdditiveGaussianNoise(clean, standardDeviation=5.0, seed=1)
+
+    filter = sitk.FastBilateralImageFilter()
+    assert filter.GetDomainSigma() == (4.0, 4.0, 4.0)
+    assert filter.GetRangeSigma() == 50.0
+    filter.SetDomainSigma(4.0)
+    filter.SetRangeSigma(20.0)
+    out = filter.Execute(noisy)
+
+    assert out.GetSize() == noisy.GetSize()
+    assert out.GetPixelID() == noisy.GetPixelID()
+
+    stats_in = sitk.StatisticsImageFilter()
+    stats_in.Execute(noisy - clean)
+    stats_out = sitk.StatisticsImageFilter()
+    stats_out.Execute(out - clean)
+    assert stats_out.GetSigma() < 0.5 * stats_in.GetSigma()
+    assert abs(out[31, 32]) < 5.0
+    assert out[32, 32] > 95.0
+
+    assert sitk.Hash(out) == sitk.Hash(sitk.FastBilateral(noisy, [4.0, 4.0], 20.0))
+
+
+def test_variance_image_filter():
+    """Test the VarianceImageFilter wrapped from the ITK AdaptiveDenoising module."""
+    if not hasattr(sitk, "VarianceImageFilter"):
+        pytest.skip("VarianceImageFilter not available")
+
+    img = sitk.Image([8, 8], sitk.sitkFloat32)
+    img[3, 3] = 9.0
+
+    filter = sitk.VarianceImageFilter()
+    assert filter.GetRadius() == (1, 1, 1)
+    out = filter.Execute(img)
+
+    assert out.GetSize() == img.GetSize()
+    assert out.GetPixelID() == img.GetPixelID()
+    assert out[0, 0] == 0.0
+    assert out[3, 3] == pytest.approx(9.0)
+    assert out[2, 2] == pytest.approx(9.0)
+    assert out[6, 6] == 0.0
+
+    assert sitk.Hash(out) == sitk.Hash(sitk.Variance(img, [1, 1]))
+
+
+def test_morphological_contour_interpolator_image_filter():
+    """Test the MorphologicalContourInterpolatorImageFilter wrapped from the ITK MorphologicalContourInterpolation module."""
+    if not hasattr(sitk, "MorphologicalContourInterpolatorImageFilter"):
+        pytest.skip("MorphologicalContourInterpolatorImageFilter not available")
+
+    volume = _sparse_label_volume()
+
+    filter = sitk.MorphologicalContourInterpolatorImageFilter()
+    assert filter.GetLabel() == 0.0
+    assert filter.GetAxis() == -1
+    assert filter.GetHeuristicAlignment()
+    assert filter.GetUseDistanceTransform()
+    assert not filter.GetUseBallStructuringElement()
+    assert filter.GetUseExtrapolation()
+    out = filter.Execute(volume)
+
+    assert out.GetSize() == volume.GetSize()
+    assert out.GetPixelID() == sitk.sitkUInt8
+    assert out[16, 16, 2] == 0
+    assert out[16, 16, 12] == 0
+    for z in range(3, 12):
+        assert out[16, 16, z] == 1
+    assert out[2, 2, 7] == 0
+
+    assert sitk.Hash(out) == sitk.Hash(sitk.MorphologicalContourInterpolator(volume))
+
+    with pytest.raises(RuntimeError):
+        filter.Execute(sitk.Image([32, 32], sitk.sitkUInt8))

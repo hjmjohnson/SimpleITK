@@ -194,6 +194,8 @@ SimpleITK Filters
      - Shift the zero-frequency components of a Fourier transform to the center of the image.
    * - `FastApproximateRankImageFilter <https://simpleitk.org/doxygen/latest/html/classitk_1_1simple_1_1FastApproximateRankImageFilter.html>`_
      - A separable rank filter.
+   * - `FastBilateralImageFilter <https://simpleitk.org/doxygen/latest/html/classitk_1_1simple_1_1FastBilateralImageFilter.html>`_
+     - A fast approximation to the bilateral filter.
    * - `FastMarchingBaseImageFilter <https://simpleitk.org/doxygen/latest/html/classitk_1_1simple_1_1FastMarchingBaseImageFilter.html>`_
      - Apply the Fast Marching method to solve an Eikonal equation on an image.
    * - `FastMarchingImageFilter <https://simpleitk.org/doxygen/latest/html/classitk_1_1simple_1_1FastMarchingImageFilter.html>`_
@@ -388,6 +390,8 @@ SimpleITK Filters
      - Computes the modulus (x % dividend) pixel-wise.
    * - `MomentsThresholdImageFilter <https://simpleitk.org/doxygen/latest/html/classitk_1_1simple_1_1MomentsThresholdImageFilter.html>`_
      - Threshold an image using the Moments Threshold.
+   * - `MorphologicalContourInterpolatorImageFilter <https://simpleitk.org/doxygen/latest/html/classitk_1_1simple_1_1MorphologicalContourInterpolatorImageFilter.html>`_
+     - Interpolates contours between slices.
    * - `MorphologicalGradientImageFilter <https://simpleitk.org/doxygen/latest/html/classitk_1_1simple_1_1MorphologicalGradientImageFilter.html>`_
      - gray scale dilation of an image
    * - `MorphologicalWatershedFromMarkersImageFilter <https://simpleitk.org/doxygen/latest/html/classitk_1_1simple_1_1MorphologicalWatershedFromMarkersImageFilter.html>`_
@@ -566,6 +570,8 @@ SimpleITK Filters
      - Transforms the image so that any pixel that is not a regional maxima is set to the minimum value for the pixel type. Pixels that are regional maxima retain their value.
    * - `ValuedRegionalMinimaImageFilter <https://simpleitk.org/doxygen/latest/html/classitk_1_1simple_1_1ValuedRegionalMinimaImageFilter.html>`_
      - Transforms the image so that any pixel that is not a regional minima is set to the maximum value for the pixel type. Pixels that are regional minima retain their value.
+   * - `VarianceImageFilter <https://simpleitk.org/doxygen/latest/html/classitk_1_1simple_1_1VarianceImageFilter.html>`_
+     - Applies a variance filter to an image.
    * - `VectorConfidenceConnectedImageFilter <https://simpleitk.org/doxygen/latest/html/classitk_1_1simple_1_1VectorConfidenceConnectedImageFilter.html>`_
      - Segment pixels with similar statistics using connectivity.
    * - `VectorConnectedComponentImageFilter <https://simpleitk.org/doxygen/latest/html/classitk_1_1simple_1_1VectorConnectedComponentImageFilter.html>`_
