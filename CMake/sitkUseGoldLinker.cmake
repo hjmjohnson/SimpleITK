@@ -35,6 +35,8 @@ if(USE_GOLD_LINKER)
   if(CMAKE_VERSION VERSION_GREATER_EQUAL "3.29")
     if(NOT DEFINED CMAKE_LINKER_TYPE)
       set(CMAKE_LINKER_TYPE "GOLD")
+      # Linker features were probed before the linker type changed.
+      set(CMAKE_LINK_DEPENDS_USE_LINKER OFF)
     endif()
   else()
     set(CMAKE_EXE_LINKER_FLAGS "-fuse-ld=gold ${CMAKE_EXE_LINKER_FLAGS}")
