@@ -40,6 +40,14 @@ if("SimpleITKFilters" IN_LIST ITK_MODULES_ENABLED)
   list(APPEND SimpleITKUnitTestSource sitkSimpleITKFiltersTests.cxx)
 endif()
 
+if("MorphologicalContourInterpolation" IN_LIST ITK_MODULES_ENABLED)
+  list(
+    APPEND
+    SimpleITKUnitTestSource
+    sitkMorphologicalContourInterpolationTests.cxx
+  )
+endif()
+
 if(SimpleITK_USE_ELASTIX)
   list(
     APPEND
